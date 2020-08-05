@@ -11,8 +11,14 @@
           />
         </v-col>
       </v-row>
-      <SearchResultItem v-if="results.length !== 0" :results="results" />
-      <h2 v-else>No photos for your input</h2>
+      <v-row v-if="results.length">
+        <SearchResultItem v-for="result in results" :key="result.id" :result="result" />
+      </v-row>
+      <v-row v-else>
+        <v-col>
+          <h2>No photos for your input</h2>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -22,13 +28,13 @@
 
   export default {
     name: 'SearchTest',
+    components: {
+      SearchResultItem
+    },
     data: () => ({
       debounce: null,
       results: []
     }),
-    components: {
-      SearchResultItem
-    },
     created() {
       this.getImages('')
     },
