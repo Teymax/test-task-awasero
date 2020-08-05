@@ -12,7 +12,9 @@
         </v-col>
       </v-row>
       <v-row v-if="results.length">
-        <SearchResultItem v-for="result in results" :key="result.id" :result="result" />
+        <v-col v-for="result in results" :key="result.id" cols="3">
+          <SearchResultItem :result="result" />
+        </v-col>
       </v-row>
       <v-row v-else>
         <v-col>
