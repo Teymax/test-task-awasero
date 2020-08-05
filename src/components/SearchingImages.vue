@@ -2,68 +2,52 @@
   <div>
     <v-container>
       <v-row>
-        <v-col cols="11">
+        <v-col>
           <v-text-field
-                  v-model="keyword"
                   placeholder="Enter Search Keyword"
                   @input="searchImages"
                   outlined
                   hide-details
           />
-
-        </v-col>
-        <v-col cols="1" class="d-flex align-center">
-          <v-btn icon x-large @click="getImages(keyword)">
-            <v-icon>mdi-file-find</v-icon>
-          </v-btn>
         </v-col>
       </v-row>
-      <v-row>
-        <v-col cols="3" v-for="result in results" :key="result.id">
-          <v-card
-                  class="mx-auto"
-                  max-width="400"
-          >
-            <v-img
-                    class="white--text align-end"
-                    height="200px"
-                    :src="result.previewURL"
-            >
-            </v-img>
-            <v-card-title>{{ result.id }}</v-card-title>
-            <v-card-subtitle class="pb-0">{{ result.user }}</v-card-subtitle>
-          </v-card>
-        </v-col>
-      </v-row>
+      <SearchResultItem v-if="results.length !== 0" :results="results" />
+      <h2 v-else>No photos for your input</h2>
     </v-container>
   </div>
 </template>
 
 <script>
-  import customAxios from '@/plugins/customAxios'
+  import SearchResultItem from "@/components/SearchResultItem";
 
   export default {
     name: 'SearchTest',
     data: () => ({
-      keyword: '',
       debounce: null,
       results: []
     }),
+    components: {
+      SearchResultItem
+    },
     created() {
       this.getImages('')
     },
     methods: {
-      getImages(keyword) {
-       let filteredKeyword = keyword.toLowerCase()
+      async getImages(keyword) {
+        let filteredKeyword = keyword.toLowerCase()
         filteredKeyword = filteredKeyword.replace(/ /g,"+")
 
-        customAxios.get('/', {
-          params: {
-            q: `${filteredKeyword}`
-          }
-        }).then(res => {
-          this.results = res.data.hits
-        }).catch(error => console.error(error))
+        try {
+          const response = await this.$http.get('/', {
+            params: {
+              q: `${filteredKeyword}`
+            }
+          })
+
+          this.results = response.data.hits
+        } catch (e) {
+          console.error(e)
+        }
       },
       searchImages(keyword) {
         clearTimeout(this.debounce)
